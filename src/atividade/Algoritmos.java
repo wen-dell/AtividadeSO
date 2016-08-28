@@ -11,14 +11,15 @@ import javax.swing.JOptionPane;
 public class Algoritmos {
 
     private Disco disco;
-    private ArrayList<Integer> valores;
+    ArrayList<Integer> valores;
+    String s = "";
 
     public Algoritmos() {
         disco = new Disco();
         valores = new ArrayList<>();
     }
 
-    private void lerValores() {
+    public String lerValores() {
         try {
             String diretorioCorrente = new File(".").getCanonicalPath() + "//src//atividade//arquivo.txt";
             File arquivo = new File(diretorioCorrente);
@@ -34,9 +35,14 @@ public class Algoritmos {
             disco.setQuantidadeSetores(valores.remove(0));
             disco.setPosicaoBraco(valores.remove(0));
 
+            for (int valor : valores) {
+                s += String.valueOf(valor) + "\n";
+            }
+
         } catch (IOException ex) {
             System.err.println("Erro: " + ex.getMessage());
         }
+        return s;
     }
 
     public void executarFCFS() {
@@ -58,9 +64,46 @@ public class Algoritmos {
     }
 
     public void executarSSF() {
-        Collections.sort(valores);
+        //Collections.sort(valores);
         int setoresPercorridos = 0;
-        for (int i = 0; i < valores.size(); i++) {
+        int posicaoAtual = 0;
+        int n = disco.getPosicaoBraco();
+        int setorMaisProximo;
+        int s = valores.get(0);
+
+        if (n > s) {
+            setorMaisProximo = n - s;
+        } else {
+            setorMaisProximo = s - n;
+        }
+
+        while (valores.size() > 0) {
+            for (int i = 0; i < valores.size(); i++) {
+                if (n > valores.get(i)) {
+                    if ((n - valores.get(i)) < setorMaisProximo) {
+                        setorMaisProximo = n - valores.get(i);
+                        posicaoAtual = valores.get(i);
+                    }
+                } else if (valores.get(i) > n) {
+                    if ((valores.get(i) - n) < setorMaisProximo) {
+                        setorMaisProximo = valores.get(i) - n;
+                        posicaoAtual = valores.get(i);
+                    }
+                }
+            }
+            setoresPercorridos = setoresPercorridos + setorMaisProximo;
+            n = posicaoAtual;
+            int x = valores.indexOf(posicaoAtual);
+            valores.remove(x);
+            Collections.sort(valores);
+            if (valores.size() > 1) {
+                setorMaisProximo = valores.get(valores.size() - 1);
+            } else if (valores.size() == 1) {
+                setorMaisProximo = valores.get(0);
+            }
+        }
+        JOptionPane.showMessageDialog(null, "Quantidade de setores percorridos com ssf: " + setoresPercorridos);
+        /*for (int i = 0; i < valores.size(); i++) {
             if (valores.get(i) <= disco.getPosicaoBraco()) {
                 for (int j = disco.getPosicaoBraco(); j > valores.get(i); j--) {
                     setoresPercorridos++;
@@ -73,7 +116,7 @@ public class Algoritmos {
                 disco.setPosicaoBraco(valores.get(i));
             }
         }
-        JOptionPane.showMessageDialog(null, "Quantidade de setores percorridos com SSF: " + setoresPercorridos);
+        JOptionPane.showMessageDialog(null, "Quantidade de setores percorridos com SSF: " + setoresPercorridos);*/
     }
 
     public void executarElevator(boolean sobe) {
@@ -99,10 +142,9 @@ public class Algoritmos {
         }
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         Algoritmos algoritmos = new Algoritmos();
         algoritmos.lerValores();
         algoritmos.executarElevator(false);
-    }
-
+    }*/
 }
